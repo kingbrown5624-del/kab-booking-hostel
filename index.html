@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kabale University - Hostel Management System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  body { background: #f4f6f8; color: #222; min-height: 100vh; }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #0b6623, #0a8f3f);
+    color: #fff; padding: 18px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  header .logo { display: flex; align-items: center; gap: 14px; }
+  header .logo .crest {
+    width: 55px; height: 55px; background: #f4c430; color: #0b6623;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 22px; border: 3px solid #fff;
+  }
+  header h1 { font-size: 20px; }
+  header h1 small { display: block; font-size: 12px; font-weight: normal; opacity: 0.9; }
+
+  nav { display: flex; gap: 10px; }
+  nav button {
+    background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.4);
+    padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;
+    transition: all 0.2s;
+  }
+  nav button:hover, nav button.active { background: #f4c430; color: #0b6623; border-color: #f4c430; }
+
+  /* Main container */
+  main { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+  .card {
+    background: #fff; border-radius: 12px; padding: 35px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08); margin-bottom: 20px;
+  }
+  .card h2 { color: #0b6623; margin-bottom: 8px; }
+  .card .subtitle { color: #666; margin-bottom: 25px; font-size: 14px; }
+
+  /* Forms */
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; color: #333; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid #d0d7de;
+    border-radius: 6px; font-size: 14px; transition: border 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none; border-color: #0b6623; box-shadow: 0 0 0 3px rgba(11,102,35,0.15);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+  .btn {
+    background: #0b6623; color: #fff; border: none; padding: 12px 28px;
+    border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600;
+    transition: background 0.2s;
+  }
+  .btn:hover { background: #084d1a; }
+  .btn-gold { background: #f4c430; color: #0b6623; }
+  .btn-gold:hover { background: #e0b420; }
+  .btn-secondary { background: #6c757d; }
+  .btn-secondary:hover { background: #545b62; }
+
+  /* Login specific */
+  .login-wrapper {
+    max-width: 420px; margin: 60px auto;
+  }
+  .login-wrapper .card { padding: 40px; }
+  .switch-link { text-align: center; margin-top: 18px; font-size: 14px; }
+  .switch-link a { color: #0b6623; cursor: pointer; font-weight: 600; text-decoration: underline; }
+
+  /* Alerts */
+  .alert {
+    padding: 12px 16px; border-radius: 6px; margin-bottom: 18px;
+    font-size: 14px; display: none;
+  }
+  .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
+  .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
+
+  /* Dashboard */
+  .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 25px; }
+  .stat-card {
+    background: linear-gradient(135deg, #0b6623, #0a8f3f); color: #fff;
+    padding: 22px; border-radius: 10px;
+  }
+  .stat-card.gold { background: linear-gradient(135deg, #f4c430, #d4a72c); color: #0b6623; }
+  .stat-card h3 { font-size: 13px; opacity: 0.9; margin-bottom: 8px; }
+  .stat-card .num { font-size: 28px; font-weight: bold; }
+
+  /* Receipt */
+  #receiptArea { display: none; }
+  .receipt {
+    border: 2px dashed #0b6623; padding: 30px; background: #fff;
+    max-width: 600px; margin: 0 auto; font-size: 14px;
+  }
+  .receipt-header { text-align: center; border-bottom: 2px solid #0b6623; padding-bottom: 15px; margin-bottom: 15px; }
+  .receipt-header h2 { color: #0b6623; }
+  .receipt-header p { font-size: 12px; color: #555; }
+  .receipt-body table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+  .receipt-body td { padding: 8px; border-bottom: 1px solid #eee; }
+  .receipt-body td:first-child { font-weight: 600; color: #555; width: 45%; }
+  .receipt-total {
+    background: #0b6623; color: #fff; padding: 12px;
+    text-align: right; font-size: 18px; font-weight: bold; border-radius: 6px; margin-top: 10px;
+  }
+  .receipt-footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; border-top: 1px dashed #999; padding-top: 12px; }
+
+  .hidden { display: none !important; }
+
+  /* Print styles */
+  @media print {
+    body { background: #fff; }
+    header, nav, .no-print, .alert { display: none !important; }
+    .card { box-shadow: none; padding: 0; }
+    .receipt { border: 1px solid #000; }
+  }
+</style>
+</head>
+<body>
+<style>
+  .search-bar {
+    display: flex;
+    max-width: 500px;
+    margin: 20px auto;
+  }
+
+  .search-bar input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px 0 0 6px;
+    font-size: 16px;
+  }
+
+  .search-bar button {
+    padding: 12px 20px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .search-bar button:hover {
+    background: #0056b3;
+  }
+</style>
+
+<header>
+  <div class="logo">
+    <div class="crest">KU</div>
+    <h1>Kabale University<small>Hostel Management System</small></h1>
+  </div>
+  <nav id="mainNav" class="hidden">
+    <button onclick="showSection('dashboard')" id="nav-dashboard" class="active">Dashboard</button>
+    <button onclick="showSection('register')" id="nav-register">Book Hostel</button>
+    <button onclick="showSection('receipt')" id="nav-receipt">My Receipt</button>
+    <button onclick="logout()">Logout</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- LOGIN / SIGNUP -->
+  <section id="authSection">
+    <div class="login-wrapper">
+      <div class="card">
+        <h2 id="authTitle">Student Login</h2>
+        <p class="subtitle" id="authSubtitle">Access your hostel account</p>
+        <div id="authAlert" class="alert"></div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>Student Registration Number</label>
+            <input type="text" id="loginRegNo" placeholder="e.g. KU/2024/001" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" required>
+          </div>
+          <button type="submit" class="btn" style="width:100%">Login</button>
+        </form>
+
+        <form id="signupForm" class="hidden" onsubmit="handleSignup(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="suName" required>
+            </div>
+            <div class="form-group">
+              <label>Reg. Number</label>
+              <input type="text" id="suRegNo" placeholder="KU/2024/..." required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="suEmail" required>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="suPhone" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Course / Programme</label>
+            <input type="text" id="suCourse" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="suPassword" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" id="suPassword2" required>
+            </div>
+          </div>
+          <button type="submit" class="btn" style="width:100%">Create Account</button>
+        </form>
+
+        <div class="switch-link" id="switchLink">
+          <span id="switchText">Don't have an account?</span>
+          <a onclick="toggleAuth()"> <span id="switchAction">Sign up here</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboardSection" class="hidden">
+    <div class="card">
+      <h2>Welcome, <span id="welcomeName">Student</span> 👋</h2>
+      <p class="subtitle">Here is your hostel account overview</p>
+
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <h3>Booking Status</h3>
+          <div class="num" id="statStatus">No booking</div>
+        </div>
+        <div class="stat-card gold">
+          <h3>Total Paid</h3>
+          <div class="num" id="statPaid">UGX 0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Room Type</h3>
+          <div class="num" id="statRoom">—</div>
+        </div>
+      </div>
+
+      <div id="noBookingMsg">
+        <p style="color:#666; margin-bottom:15px;">You haven't booked a hostel yet. Click below to start your application.</p>
+        <button class="btn" onclick="showSection('register')">Apply for Hostel</button>
+      </div>
+
+      <div id="hasBookingMsg" class="hidden">
+        <p style="color:#666; margin-bottom:15px;">You have an active hostel booking. View or print your receipt below.</p>
+        <button class="btn btn-gold" onclick="showSection('receipt')">🖨️ View / Print Receipt</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTRATION / BOOKING FORM -->
+  <section id="registerSection" class="hidden">
+    <div class="card">
+      <h2>Hostel Booking Form</h2>
+      <p class="subtitle">Fill in the details below to reserve your hostel room</p>
+      <div id="regAlert" class="alert"></div>
+
+      <form id="bookingForm" onsubmit="handleBooking(event)">
+        <h3 style="color:#0b6623; margin-bottom:12px; font-size:16px;">Personal Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="bkName" readonly>
+          </div>
+          <div class="form-group">
+            <label>Registration Number</label>
+            <input type="text" id="bkRegNo" readonly>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="bkGender" required>
+              <option value="">-- Select --</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Year of Study</label>
+            <select id="bkYear" required>
+              <option value="">-- Select --</option>
+              <option>Year 1</option><option>Year 2</option>
+              <option>Year 3</option><option>Year 4</option>
+              <option>Postgraduate</option>
+            </select>
+          </div>
+        </div>
+
+        <h3 style="color:#0b6623; margin:20px 0 12px; font-size:16px;">Hostel Details</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Hostel Block</label>
+            <select id="bkBlock" required onchange="updateFee()">
+              <option value="">-- Select --</option>
+              <option value="A">Block A - Main Campus (UGX 900,000/sem)</option>
+              <option value="B">Block B - North Wing (UGX 750,000/sem)</option>
+              <option value="C">Block C - Premium (UGX 1,200,000/sem)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Room Type</label>
+            <select id="bkRoom" required onchange="updateFee()">
+              <option value="">-- Select --</option>
+              <option value="Single" data-mult="1.4">Single Occupancy</option>
+              <option value="Double" data-mult="1.0">Double Sharing</option>
+              <option value="Dormitory" data-mult="0.7">Dormitory (4-bed)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Duration</label>
+            <select id="bkDuration" required onchange="updateFee()">
+              <option value="1">1 Semester</option>
+              <option value="2" selected>2 Semesters (Full Year)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Estimated Total Fee (UGX)</label>
+            <input type="text" id="bkFee" readonly style="background:#f0f0f0; font-weight:bold; color:#0b6623;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Special Requests / Medical Notes (optional)</label>
+          <textarea id="bkNotes" rows="3" placeholder="Any dietary, medical or accessibility needs..."></textarea>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:20px;">
+          <button type="submit" class="btn">Submit Booking</button>
+          <button type="button" class="btn btn-secondary" onclick="showSection('dashboard')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- RECEIPT -->
+  <section id="receiptSection" class="hidden">
+    <div class="card no-print">
+      <h2>Your Hostel Receipt</h2>
+      <p class="subtitle">Review your booking details and print a copy for your records</p>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-gold" onclick="window.print()">🖨️ Print Receipt</button>
+        <button class="btn btn-secondary" onclick="showSection('dashboard')">Back to Dashboard</button>
+      </div>
+    </div>
+
+    <div id="receiptArea">
+      <div class="receipt" id="receiptContent">
+        <div class="receipt-header">
+          <h2>KABALE UNIVERSITY</h2>
+          <p>P.O. Box 317, Kabale, Uganda | +256-XXX-XXXXX</p>
+          <p><strong>HOSTEL ACCOMMODATION RECEIPT</strong></p>
+        </div>
+        <div class="receipt-body">
+          <table>
+            <tr><td>Receipt No.</td><td id="rNo">—</td></tr>
+            <tr><td>Date Issued</td><td id="rDate">—</td></tr>
+            <tr><td>Student Name</td><td id="rName">—</td></tr>
+            <tr><td>Registration No.</td><td id="rReg">—</td></tr>
+            <tr><td>Course</td><td id="rCourse">—</td></tr>
+            <tr><td>Gender / Year</td><td id="rMeta">—</td></tr>
+            <tr><td>Hostel Block</td><td id="rBlock">—</td></tr>
+            <tr><td>Room Type</td><td id="rRoom">—</td></tr>
+            <tr><td>Duration</td><td id="rDur">—</td></tr>
+            <tr><td>Accommodation Fee</td><td id="rFee">—</td></tr>
+            <tr><td>Service Charge</td><td id="rService">—</td></tr>
+          </table>
+          <div class="receipt-total">TOTAL PAID: <span id="rTotal">UGX 0</span></div>
+        </div>
+        <div class="receipt-footer">
+          <p>This is a computer-generated receipt. Thank you for choosing Kabale University Hostels.</p>
+          <p><em>For enquiries, contact the Dean of Students Office.</em></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="noReceiptMsg" class="card" style="text-align:center;">
+      <p style="color:#666;">You have no booking yet. Please register for a hostel first.</p>
+      <button class="btn" onclick="showSection('register')">Book Hostel</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // ---------- Data layer (localStorage) ----------
+  const DB = {
+    getUsers: () => JSON.parse(localStorage.getItem('ku_users') || '{}'),
+    saveUsers: (u) => localStorage.setItem('ku_users', JSON.stringify(u)),
+    getCurrent: () => localStorage.getItem('ku_current'),
+    setCurrent: (regNo) => localStorage.setItem('ku_current', regNo),
+    clearCurrent: () => localStorage.removeItem('ku_current'),
+    getBooking: (regNo) => {
+      const b = localStorage.getItem('ku_booking_' + regNo);
+      return b ? JSON.parse(b) : null;
+    },
+    saveBooking: (regNo, data) => localStorage.setItem('ku_booking_' + regNo, JSON.stringify(data))
+  };
+
+  // ---------- Auth ----------
+  let isLogin = true;
+  function toggleAuth() {
+    isLogin = !isLogin;
+    document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
+    document.getElementById('signupForm').classList.toggle('hidden', isLogin);
+    document.getElementById('authTitle').textContent = isLogin ? 'Student Login' : 'Create Account';
+    document.getElementById('authSubtitle').textContent = isLogin ? 'Access your hostel account' : 'Register to book a hostel room';
+    document.getElementById('switchText').textContent = isLogin ? "Don't have an account?" : 'Already have an account?';
+    document.getElementById('switchAction').textContent = isLogin ? 'Sign up here' : 'Login here';
+    hideAlert('authAlert');
+  }
+
+  function showAlert(id, msg, type) {
+    const el = document.getElementById(id);
+    el.className = 'alert ' + type;
+    el.textContent = msg;
+  }
+  function hideAlert(id) { document.getElementById(id).className = 'alert'; }
+
+  function handleSignup(e) {
+    e.preventDefault();
+    const name = suName.value.trim();
+    const regNo = suRegNo.value.trim().toUpperCase();
+    const email = suEmail.value.trim();
+    const phone = suPhone.value.trim();
+    const course = suCourse.value.trim();
+    const pw = suPassword.value;
+    const pw2 = suPassword2.value;
+
+    if (pw !== pw2) { showAlert('authAlert', 'Passwords do not match', 'error'); return; }
+
+    const users = DB.getUsers();
+    if (users[regNo]) { showAlert('authAlert', 'Registration number already exists', 'error'); return; }
+
+    users[regNo] = { name, regNo, email, phone, course, password: pw };
+    DB.saveUsers(users);
+    showAlert('authAlert', 'Account created! Please login.', 'success');
+    setTimeout(() => { toggleAuth(); loginForm.reset(); }, 1200);
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const regNo = loginRegNo.value.trim().toUpperCase();
+    const pw = loginPassword.value;
+    const users = DB.getUsers();
+    if (!users[regNo] || users[regNo].password !== pw) {
+      showAlert('authAlert', 'Invalid registration number or password', 'error');
+      return;
+    }
+    DB.setCurrent(regNo);
+    enterApp();
+  }
+
+  function logout() {
+    DB.clearCurrent();
+    location.reload();
+  }
+
+  // ---------- Navigation ----------
+  function showSection(name) {
+    ['authSection','dashboardSection','registerSection','receiptSection'].forEach(id => {
+      document.getElementById(id).classList.add('hidden');
+    });
+    document.getElementById(name + 'Section').classList.remove('hidden');
+    ['dashboard','register','receipt'].forEach(n => {
+      document.getElementById('nav-' + n).classList.toggle('active', n === name);
+    });
+    if (name === 'dashboard') refreshDashboard();
+    if (name === 'register') prefillBookingForm();
+    if (name === 'receipt') refreshReceipt();
+  }
+
+  function enterApp() {
+    document.getElementById('authSection').classList.add('hidden');
+    document.getElementById('mainNav').classList.remove('hidden');
+    showSection('dashboard');
+  }
+
+  // ---------- Dashboard ----------
+  function refreshDashboard() {
+    const user = DB.getUsers()[DB.getCurrent()];
+    const booking = DB.getBooking(user.regNo);
+    welcomeName.textContent = user.name.split(' ')[0];
+
+    if (!booking) {
+      statStatus.textContent = 'No booking';
+      statPaid.textContent = 'UGX 0';
+      statRoom.textContent = '—';
+      noBookingMsg.classList.remove('hidden');
+      hasBookingMsg.classList.add('hidden');
+    } else {
+      statStatus.textContent = 'Confirmed';
+      statPaid.textContent = 'UGX ' + booking.total.toLocaleString();
+      statRoom.textContent = booking.room;
+      noBookingMsg.classList.add('hidden');
+      hasBookingMsg.classList.remove('hidden');
+    }
+  }
+
+  // ---------- Booking form ----------
+  function prefillBookingForm() {
+    const user = DB.getUsers()[DB.getCurrent()];
+    bkName.value = user.name;
+    bkRegNo.value = user.regNo;
+    updateFee();
+  }
+
+  function updateFee() {
+    const blockSel = document.getElementById('bkBlock');
+    const roomSel = document.getElementById('bkRoom');
+    const dur = parseInt(bkDuration.value) || 2;
+
+    const blockFees = { A: 900000, B: 750000, C: 1200000 };
+    const base = blockFees[blockSel.value] || 0;
+    const mult = roomSel.selectedOptions[0]?.dataset.mult || 1;
+    const total = Math.round(base * mult * dur);
+    bkFee.value = total ? 'UGX ' + total.toLocaleString() : '';
+  }
+
+  function handleBooking(e) {
+    e.preventDefault();
+    const user = DB.getUsers()[DB.getCurrent()];
+    if (DB.getBooking(user.regNo)) {
+      showAlert('regAlert', 'You already have a booking. View it in the Receipt section.', 'error');
+      return;
+    }
+
+    const blockSel = document.getElementById('bkBlock');
+    const roomSel = document.getElementById('bkRoom');
+    const dur = parseInt(bkDuration.value);
+    const blockFees = { A: 900000, B: 750000, C: 1200000 };
+    const base = blockFees[blockSel.value];
+    const mult = parseFloat(roomSel.selectedOptions[0].dataset.mult);
+    const fee = Math.round(base * mult * dur);
+    const service = 50000;
+
+    const booking = {
+      receiptNo: 'KU-HST-' + Date.now().toString().slice(-8),
+      date: new Date().toLocaleString(),
+      name: user.name,
+      regNo: user.regNo,
+      course: user.course,
+      gender: bkGender.value,
+      year: bkYear.value,
+      block: blockSel.value,
+      room: roomSel.value,
+      duration: dur + (dur === 1 ? ' Semester' : ' Semesters'),
+      fee: fee,
+      service: service,
+      total: fee + service,
+      notes: bkNotes.value
+    };
+
+    DB.saveBooking(user.regNo, booking);
+    showAlert('regAlert', 'Booking successful! Redirecting to receipt...', 'success');
+    setTimeout(() => showSection('receipt'), 1500);
+  }
+
+  // ---------- Receipt ----------
+  function refreshReceipt() {
+    const user = DB.getUsers()[DB.getCurrent()];
+    const b = DB.getBooking(user.regNo);
+    if (!b) {
+      receiptArea.style.display = 'none';
+      noReceiptMsg.classList.remove('hidden');
+      return;
+    }
+    receiptArea.style.display = 'block';
+    noReceiptMsg.classList.add('hidden');
+
+    rNo.textContent = b.receiptNo;
+    rDate.textContent = b.date;
+    rName.textContent = b.name;
+    rReg.textContent = b.regNo;
+    rCourse.textContent = b.course;
+    rMeta.textContent = b.gender + ' / ' + b.year;
+    rBlock.textContent = 'Block ' + b.block;
+    rRoom.textContent = b.room;
+    rDur.textContent = b.duration;
+    rFee.textContent = 'UGX ' + b.fee.toLocaleString();
+    rService.textContent = 'UGX ' + b.service.toLocaleString();
+    rTotal.textContent = 'UGX ' + b.total.toLocaleString();
+  }
+
+  // ---------- Boot ----------
+  if (DB.getCurrent() && DB.getUsers()[DB.getCurrent()]) {
+    enterApp();
+  }
+</script>
+</body>
+</html>
